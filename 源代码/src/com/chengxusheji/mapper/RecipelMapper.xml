@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.RecipelMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加个性DIY制作记录 -->
+	<insert id="addRecipel" parameterType="recipel">
+		insert into t_recipel(recipelPhoto,userObj,recipelMemo,handState,addTime) values 
+		(#{recipelPhoto},#{userObj.user_name},#{recipelMemo},#{handState},#{addTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询个性DIY制作记录 -->
+	<select id="queryRecipel" resultMap="recipelMap" >
+		select t_recipel.* from t_recipel,t_userInfo ${where} and t_recipel.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="recipelMap" type="recipel">
+        <id property="recipelId" column="recipelId" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有个性DIY制作记录 -->
+	<select id="queryRecipelList" resultMap="recipelMap" >
+		select t_recipel.* from t_recipel,t_userInfo ${where} and t_recipel.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的个性DIY制作记录数 -->
+	<select id="queryRecipelCount" resultType="int">
+		select count(*) from t_recipel,t_userInfo ${where} and t_recipel.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个个性DIY制作记录 -->
+	<select id="getRecipel" parameterType="int" resultMap="recipelMap">
+		select * from t_recipel where t_recipel.recipelId = #{recipelId}
+	</select>
+
+	<!-- 更新个性DIY制作记录 -->
+	<update id="updateRecipel" parameterType="recipel">
+		update t_recipel set recipelPhoto=#{recipelPhoto},userObj=#{userObj.user_name},recipelMemo=#{recipelMemo},handState=#{handState},addTime=#{addTime} where recipelId = #{recipelId}
+	</update>
+
+	<!-- 删除个性DIY制作记录 -->
+	<delete id="deleteRecipel" parameterType="int">
+		delete from t_recipel where recipelId=#{recipelId}
+	</delete>
+
+</mapper>

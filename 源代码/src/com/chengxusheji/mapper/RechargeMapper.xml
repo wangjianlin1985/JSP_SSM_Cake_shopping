@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.RechargeMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加充值记录 -->
+	<insert id="addRecharge" parameterType="recharge">
+		insert into t_recharge(userObj,rechargeMoney,rechargeMemo,rechargeTime) values 
+		(#{userObj.user_name},#{rechargeMoney},#{rechargeMemo},#{rechargeTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询充值记录 -->
+	<select id="queryRecharge" resultMap="rechargeMap" >
+		select t_recharge.* from t_recharge,t_userInfo ${where} and t_recharge.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="rechargeMap" type="recharge">
+        <id property="rechargeId" column="rechargeId" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有充值记录 -->
+	<select id="queryRechargeList" resultMap="rechargeMap" >
+		select t_recharge.* from t_recharge,t_userInfo ${where} and t_recharge.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的充值记录数 -->
+	<select id="queryRechargeCount" resultType="int">
+		select count(*) from t_recharge,t_userInfo ${where} and t_recharge.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个充值记录 -->
+	<select id="getRecharge" parameterType="int" resultMap="rechargeMap">
+		select * from t_recharge where t_recharge.rechargeId = #{rechargeId}
+	</select>
+
+	<!-- 更新充值记录 -->
+	<update id="updateRecharge" parameterType="recharge">
+		update t_recharge set userObj=#{userObj.user_name},rechargeMoney=#{rechargeMoney},rechargeMemo=#{rechargeMemo},rechargeTime=#{rechargeTime} where rechargeId = #{rechargeId}
+	</update>
+
+	<!-- 删除充值记录 -->
+	<delete id="deleteRecharge" parameterType="int">
+		delete from t_recharge where rechargeId=#{rechargeId}
+	</delete>
+
+</mapper>
